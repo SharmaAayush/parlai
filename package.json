@@ -6,7 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "db:generate": "pnpm typeorm migration:generate -d src/server/db/data-source.ts",
+    "db:migrate": "pnpm typeorm migration:run -d src/server/db/data-source.ts",
+    "db:revert": "pnpm typeorm migration:revert -d src/server/db/data-source.ts"
   },
   "dependencies": {
     "next": "16.4.3",
@@ -18,10 +25,15 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^5.0.5",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.10",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^5.0.5"
   },
   "packageManager": "pnpm@12.15.0"
 }
