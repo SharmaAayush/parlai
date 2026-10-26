@@ -1,3 +1,7 @@
+# Agent guide
+
+Conventions, formats, and the full step-by-step plan live in [`plan/00-README.md`](plan/00-README.md). Read it before writing code; the per-step files in [`plan/`](plan/) contain the detailed instructions for each phase.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
