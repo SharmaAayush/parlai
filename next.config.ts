@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  serverExternalPackages: [
+    'typeorm',
+    'pg',
+    'reflect-metadata',
+    'typeorm-naming-strategies',
+  ]
 };
 
 export default nextConfig;
