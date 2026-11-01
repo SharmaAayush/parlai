@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=parlai
+      - POSTGRES_PASSWORD=parlai
+      - POSTGRES_DB=parlai
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U parlai -d parlai"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

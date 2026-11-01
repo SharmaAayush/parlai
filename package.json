@@ -11,18 +11,25 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",
+    "typeorm": "tsx ./node_modules/typeorm/cli.js",
     "db:generate": "pnpm typeorm migration:generate -d src/server/db/data-source.ts",
+    "db:create": "pnpm typeorm migration:create",
     "db:migrate": "pnpm typeorm migration:run -d src/server/db/data-source.ts",
     "db:revert": "pnpm typeorm migration:revert -d src/server/db/data-source.ts"
   },
   "dependencies": {
     "next": "16.4.3",
+    "pg": "^8.23.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^1.1.2",
+    "typeorm-naming-strategies": "^4.1.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^5.0.5",
@@ -31,6 +38,7 @@
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.10",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^5.0.5"

@@ -1,0 +1,1 @@
+CREATE DATABASE parlai_test;
