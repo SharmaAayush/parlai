@@ -62,24 +62,46 @@ This file tracks the implementation status of each step in the plan.
 
 ---
 
-### S0.3: Validated env module ⏳ PENDING
+### S0.3: Validated env module ✅ COMPLETED
 **Goal:** one typed, validated place for all configuration; fail fast on mistakes.
 
-**Status:** Not started
+**Verified:**
+- [x] Starting the app with `DATABASE_URL` removed prints a clear error and exits
+- [x] `pnpm build` works with **no** `.env` file present
+- [x] Env tests pass
+
+**Files created/modified:**
+- `src/server/env.ts` - Zod schema with lazy, memoised env object
+- `src/instrumentation.ts` - Forces env validation at runtime startup
+- `src/server/env.test.ts` - Tests for valid/invalid env, memoization
+- `.env.example` - Updated with all variables and comments
 
 ---
 
-### S0.4: Test harness with a real database ⏳ PENDING
+### S0.4: Test harness with a real database ✅ COMPLETED
 **Goal:** integration tests that use Postgres, each starting from a clean state.
 
-**Status:** Not started
+**Verified:**
+- [x] `pnpm test` runs the DB test and passes twice in a row
+- [x] The `_test` guard exists and has a test
+
+**Files created/modified:**
+- `tests/global-setup.ts` - Applies migrations to test database
+- `tests/helpers/db.ts` - `assertTestDatabase()`, `resetDb()`, `getTestDataSource()`
+- `tests/db-harness.test.ts` - Sample tests for the harness
+- `vitest.config.ts` - Configured globalSetup, test env, fileParallelism: false
+- `.env` - Added TEST_DATABASE_URL
 
 ---
 
-### S0.5: Continuous integration ⏳ PENDING
+### S0.5: Continuous integration ✅ COMPLETED
 **Goal:** every PR runs lint, typecheck, tests, and build.
 
-**Status:** Not started
+**Verified:**
+- [x] All CI checks pass locally (lint, typecheck, test, build)
+
+**Files created/modified:**
+- `.github/workflows/ci.yml` - CI workflow with postgres service
 
 ---
 
@@ -110,11 +132,11 @@ This file tracks the implementation status of each step in the plan.
 |------|--------|----------|
 | S0.1 | ✅ Complete | All checks pass |
 | S0.2 | ✅ Complete | All checks pass |
-| S0.3 | ⏳ Pending | - |
-| S0.4 | ⏳ Pending | - |
-| S0.5 | ⏳ Pending | - |
+| S0.3 | ✅ Complete | All checks pass |
+| S0.4 | ✅ Complete | All checks pass |
+| S0.5 | ✅ Complete | All checks pass |
 | S0.6 | ⏳ Pending | - |
 | S0.7 | ⏳ Pending | - |
 | S0.8 | ⏳ Pending | - |
 
-**Last Updated:** 2026-10-28
+**Last Updated:** 2026-11-01
