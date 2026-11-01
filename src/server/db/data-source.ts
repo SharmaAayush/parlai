@@ -4,17 +4,11 @@ import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { entities } from './entities';
 import { migrations } from './migrations';
+import { env } from '../env';
 
 // Relative imports only in this folder (README rule 11).
-if (!process.env.DATABASE_URL && typeof process.loadEnvFile === 'function') {
-  try {
-    process.loadEnvFile();
-  } catch {
-    // Ignore if .env is missing (e.g. Docker, CI)
-  }
-}
 
-export function createDataSource(url = process.env.DATABASE_URL) {
+export function createDataSource(url = env.DATABASE_URL) {
   return new DataSource({
     type: 'postgres',
     url,
