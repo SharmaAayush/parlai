@@ -20,7 +20,8 @@ const nextConfig: NextConfig = {
     'pg',
     'reflect-metadata',
     'typeorm-naming-strategies',
-  ]
+  ],
+  output: 'standalone',
 };
 
 export default nextConfig;

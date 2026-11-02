@@ -15,7 +15,9 @@
     "db:generate": "pnpm typeorm migration:generate -d src/server/db/data-source.ts",
     "db:create": "pnpm typeorm migration:create",
     "db:migrate": "pnpm typeorm migration:run -d src/server/db/data-source.ts",
-    "db:revert": "pnpm typeorm migration:revert -d src/server/db/data-source.ts"
+    "db:revert": "pnpm typeorm migration:revert -d src/server/db/data-source.ts",
+    "build:migrate": "esbuild scripts/migrate.ts --bundle --platform=node --target=node20 --packages=external --outfile=dist/migrate.js",
+    "docker:build": "docker build -t parl-ai:local ."
   },
   "dependencies": {
     "next": "16.4.3",
@@ -35,6 +37,7 @@
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^5.0.5",
     "dotenv": "^18.0.9",
+    "esbuild": "^0.28.2",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
     "eslint-config-prettier": "^10.1.8",

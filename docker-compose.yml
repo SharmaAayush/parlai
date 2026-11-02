@@ -15,6 +15,29 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    networks:
+      - parl-ai-network
+
+  app:
+    profiles: ["full"]
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://parlai:parlai@db:5432/parlai
+      RUN_MIGRATIONS: "true"
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - parl-ai-network
 
 volumes:
   pgdata:
+
+networks:
+  parl-ai-network:
+    driver: bridge

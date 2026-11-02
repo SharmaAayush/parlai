@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+dist
+.env*
+! .env.example
+tests
+docker
+*.log
+*.md
+! README.md
