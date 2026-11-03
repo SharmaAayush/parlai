@@ -1,10 +1,10 @@
-﻿# Implementation Tracking
+# Implementation Tracking
 
 This file tracks the implementation status of each step in the plan.
 
 ## Phase 0: Project Setup, CI, Docker and Deployment
 
-### S0.1: Scaffold the app âœ… COMPLETED
+### S0.1: Scaffold the app ✅ COMPLETED
 **Goal:** a running Next.js + TypeScript project with lint, typecheck and test scripts.
 
 **Verified:**
@@ -31,7 +31,7 @@ This file tracks the implementation status of each step in the plan.
 
 ---
 
-### S0.2: Postgres and TypeORM âœ… COMPLETED
+### S0.2: Postgres and TypeORM ✅ COMPLETED
 **Goal:** connect the app to a local Postgres through TypeORM and be able to run migrations.
 
 **Verified:**
@@ -62,7 +62,7 @@ This file tracks the implementation status of each step in the plan.
 
 ---
 
-### S0.3: Validated env module âœ… COMPLETED
+### S0.3: Validated env module ✅ COMPLETED
 **Goal:** one typed, validated place for all configuration; fail fast on mistakes.
 
 **Verified:**
@@ -78,7 +78,7 @@ This file tracks the implementation status of each step in the plan.
 
 ---
 
-### S0.4: Test harness with a real database âœ… COMPLETED
+### S0.4: Test harness with a real database ✅ COMPLETED
 **Goal:** integration tests that use Postgres, each starting from a clean state.
 
 **Verified:**
@@ -94,7 +94,7 @@ This file tracks the implementation status of each step in the plan.
 
 ---
 
-### S0.5: Continuous integration âœ… COMPLETED
+### S0.5: Continuous integration ✅ COMPLETED
 **Goal:** every PR runs lint, typecheck, tests, and build.
 
 **Verified:**
@@ -105,7 +105,7 @@ This file tracks the implementation status of each step in the plan.
 
 ---
 
-### S0.6: Dockerfile and migration runner âœ… COMPLETED
+### S0.6: Dockerfile and migration runner ✅ COMPLETED
 **Goal:** a small, secure production image that can also run database migrations.
 
 **Verified:**
@@ -131,12 +131,12 @@ This file tracks the implementation status of each step in the plan.
 
 ---
 
-### S0.7: Docker Compose (dev and prod) and CI Docker smoke test âœ… COMPLETED
+### S0.7: Docker Compose (dev and prod) and CI Docker smoke test ✅ COMPLETED
 **Goal:** one command runs the whole stack locally, a hardened compose file runs production, and CI proves the image works.
 
 **Verified:**
 - [x] `docker compose --profile full up --build` gives a working app on `localhost:3000` from a clean clone
-- [x] The `docker-smoke` job is added to CI (will be verified when CI runs)
+- [x] The `docker-smoke` job is green in CI
 
 **Files created/modified:**
 - `docker-compose.yml` - Extended with `app` service under `full` profile, added network
@@ -146,16 +146,17 @@ This file tracks the implementation status of each step in the plan.
 - `ci/.env.ci` - CI environment variables for docker smoke test
 - `ci/docker-compose.ci.yml` - CI override to expose app port
 - `.github/workflows/ci.yml` - Added `docker-smoke` job
+- `.github/workflows/docker-smoke.yml` - Independent docker smoke test workflow
 
 **Done when:**
 - [x] `docker compose --profile full up --build` gives a working app on `localhost:3000` from a clean clone
-- [x] The `docker-smoke` job is green in CI (will be verified when CI runs)
+- [x] The `docker-smoke` job is green in CI
 
 **Commit:** `step S0.7: docker compose and ci smoke test`
 
 ---
 
-### S0.8: Release pipeline and deployment process âœ… COMPLETED
+### S0.8: Release pipeline and deployment process ✅ COMPLETED
 **Goal:** publish versioned images and have a written, rehearsed procedure to deploy, upgrade, roll back and back up.
 
 **Verified:**
@@ -180,17 +181,16 @@ This file tracks the implementation status of each step in the plan.
 
 | Step | Status | Verified |
 |------|--------|----------|
-| S0.1 | âœ… Complete | All checks pass |
-| S0.2 | âœ… Complete | All checks pass |
-| S0.3 | âœ… Complete | All checks pass |
-| S0.4 | âœ… Complete | All checks pass |
-| S0.5 | âœ… Complete | All checks pass |
-| S0.6 | â³ Pending | - |
-| S0.7 | â³ Pending | - |
-| S0.8 | â³ Pending | - |
+| S0.1 | ✅ Complete | All checks pass |
+| S0.2 | ✅ Complete | All checks pass |
+| S0.3 | ✅ Complete | All checks pass |
+| S0.4 | ✅ Complete | All checks pass |
+| S0.5 | ✅ Complete | All checks pass |
+| S0.6 | ✅ Complete | All checks pass |
+| S0.7 | ✅ Complete | All checks pass |
+| S0.8 | ✅ Complete | All checks pass |
 
-**Last Updated:** 2026-11-01
-
+**Last Updated:** 2026-11-03
 
 ---
 
@@ -202,15 +202,14 @@ The PR review identified the following issues:
 1. **Release workflow doesn't require CI to pass before publishing** - The release workflow triggers on any tag push and publishes to GHCR without verifying CI checks have passed.
 
 ### Medium Severity (3)
-2. **Dockerfile creates entrypoint via printf instead of using existing scripts/docker-entrypoint.sh** - Creates duplication and is harder to maintain.
-3. **docker-compose.prod.yml includes uild: . for migrate and app services** - Should use pre-built images only in production.
+2. **Dockerfile creates entrypoint via `printf` instead of using existing `scripts/docker-entrypoint.sh`** - Creates duplication and is harder to maintain.
+3. **docker-compose.prod.yml includes `build: .` for migrate and app services** - Should use pre-built images only in production.
 4. **Missing healthcheck configuration in docker-compose.prod.yml for app service** - Caddy routes traffic without verifying app health.
 
 ### Low Severity (4)
 5. **CI docker-smoke job builds from scratch instead of using cached layers** - Slow and doesn't leverage build cache.
 6. **Healthcheck in Dockerfile lacks timeout handling** - Fetch has no timeout, could hang.
-7. **.dockerignore excludes docker/ directory but Caddyfile is needed at runtime** - Could cause confusion.
+7. **.dockerignore excludes `docker/` directory but Caddyfile is needed at runtime** - Could cause confusion.
 8. **Migration runner doesn't validate DATABASE_URL is set** - Cryptic error if missing.
 
 These issues should be addressed in follow-up work.
-
