@@ -17,7 +17,6 @@ services:
 
   migrate:
     image: ${PARLAI_IMAGE:-parl-ai:local}
-    build: .
     command: ["node", "dist/migrate.js"]
     env_file: .env.production
     environment:
