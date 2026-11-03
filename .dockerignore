@@ -5,7 +5,8 @@ dist
 .env*
 ! .env.example
 tests
-docker
+# docker/ directory is excluded because Caddyfile is volume-mounted, not copied
 *.log
 *.md
 ! README.md
+! scripts/

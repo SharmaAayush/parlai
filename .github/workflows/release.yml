@@ -4,13 +4,29 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: read
   packages: write
 
 jobs:
+  check-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check CI status
+        run: |
+          # Get the latest CI run for this commit
+          CI_RUN=$(gh api repos/${{ github.repository }}/actions/runs \
+            --jq '.workflow_runs[] | select(.head_sha == "'${{ github.sha }}'" and .name == "CI") | .conclusion' | head -1)
+          if [ "$CI_RUN" != "success" ]; then
+            echo "CI did not pass for this commit"
+            exit 1
+          fi
+
   image:
+    needs: check-ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

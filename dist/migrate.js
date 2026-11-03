@@ -34,37 +34,11 @@ var entities = [];
 // src/server/db/migrations/index.ts
 var migrations = [];
 
-// src/server/env.ts
-var import_zod = require("zod");
-var envSchema = import_zod.z.object({
-  DATABASE_URL: import_zod.z.string().url("DATABASE_URL must be a valid URL"),
-  APP_URL: import_zod.z.string().url("APP_URL must be a valid URL").default("http://localhost:3000"),
-  NODE_ENV: import_zod.z.enum(["development", "test", "production"]).default("development")
-});
-var cachedEnv = null;
-function parseEnv(source) {
-  const result = envSchema.safeParse(source);
-  if (!result.success) {
-    const issues = result.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("\n");
-    throw new Error(`Invalid environment configuration:
-${issues}`);
-  }
-  return result.data;
-}
-var env = new Proxy({}, {
-  get(_target, prop) {
-    if (cachedEnv === null) {
-      cachedEnv = parseEnv(process.env);
-    }
-    return cachedEnv[prop];
-  }
-});
-
 // src/server/db/data-source.ts
-function createDataSource(url = env.DATABASE_URL) {
+function createDataSource(url) {
   return new import_typeorm.DataSource({
     type: "postgres",
-    url,
+    url: url ?? process.env.DATABASE_URL,
     driver: import_pg.default,
     // static import so Docker's file tracing includes `pg`
     namingStrategy: new import_typeorm_naming_strategies.SnakeNamingStrategy(),
@@ -79,6 +53,10 @@ var data_source_default = createDataSource();
 
 // scripts/migrate.ts
 async function main() {
+  if (!process.env.DATABASE_URL) {
+    console.error("DATABASE_URL not set");
+    process.exit(1);
+  }
   const revert = process.argv.includes("--revert");
   const ds = await data_source_default.initialize();
   try {

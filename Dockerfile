@@ -26,6 +26,6 @@ RUN printf '#!/bin/sh\nset -e\nif [ "${RUN_MIGRATIONS:-false}" = "true" ]; then\
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+  CMD node -e "const c=new AbortController();setTimeout(()=>c.abort(),4000);fetch('http://127.0.0.1:3000/api/health',{signal:c.signal}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["node", "server.js"]

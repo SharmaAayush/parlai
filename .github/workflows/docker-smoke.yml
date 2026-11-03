@@ -14,8 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build image
-        run: docker build -t parl-ai:local .
+      - name: Build image with cache
+        run: |
+          docker buildx build \
+            --cache-from type=gha \
+            --cache-to type=gha,mode=max \
+            -t parl-ai:local .
       - name: Start stack
         run: |
           cp ci/.env.ci .env.production

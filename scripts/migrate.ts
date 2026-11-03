@@ -1,6 +1,11 @@
 import createDataSourceDefault from '../src/server/db/data-source'; // default export is a DataSource
 
 async function main() {
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL not set');
+    process.exit(1);
+  }
+
   const revert = process.argv.includes('--revert');
   const ds = await createDataSourceDefault.initialize();
   try {
