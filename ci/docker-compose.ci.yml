@@ -1,0 +1,11 @@
+services:
+  app:
+    ports:
+      - "3000:3000"
+  caddy:
+    profiles: ["proxy"]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: "localhost"

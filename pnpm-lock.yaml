@@ -212,6 +212,9 @@ importers:
       dotenv:
         specifier: ^18.0.9
         version: 18.0.9
+      esbuild:
+        specifier: ^0.28.2
+        version: 0.28.2
       eslint:
         specifier: ^9
         version: 9.39.5(jiti@2.7.0)(supports-color@7.2.0)

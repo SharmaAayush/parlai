@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+dist
+.env*
+! .env.example
+tests
+# docker/ directory is excluded because Caddyfile is volume-mounted, not copied
+*.log
+*.md
+! README.md
+! scripts/
