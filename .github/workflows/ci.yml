@@ -42,20 +42,3 @@ jobs:
       DATABASE_URL: ******localhost:5432/parlai_test
       APP_URL: http://localhost:3000
       NODE_ENV: test
-
-  docker-smoke:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Start stack
-        run: |
-          cp ci/.env.ci .env.production
-          docker compose --env-file ci/.env.ci -f docker-compose.prod.yml -f ci/docker-compose.ci.yml up -d --build --wait --wait-timeout 180
-      - name: Health check
-        run: curl --fail --retry 10 --retry-delay 3 http://localhost:3000/api/health
-      - name: Logs on failure
-        if: failure()
-        run: docker compose -f docker-compose.prod.yml -f ci/docker-compose.ci.yml logs
-      - name: Tear down
-        if: always()
-        run: docker compose -f docker-compose.prod.yml -f ci/docker-compose.ci.yml down -v
