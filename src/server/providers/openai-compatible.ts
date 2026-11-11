@@ -1,11 +1,12 @@
 import { z } from 'zod';
-import { ChatProvider, ModelInfo } from './types';
+import { ChatProvider, ChatRequest, ChatChunk, ModelInfo } from './types';
 import {
   ProviderAuthError,
   ProviderUnavailableError,
   ProviderBadResponseError,
   ProviderError,
 } from './errors';
+import { parseSse } from './sse';
 
 interface OpenAICompatibleConfig {
   id: string;
@@ -23,7 +24,27 @@ const ModelsListSchema = z.object({
   data: z.array(ModelSchema),
 });
 
+const ChatCompletionChunkSchema = z.object({
+  choices: z
+    .array(
+      z.object({
+        delta: z.object({
+          content: z.string().optional(),
+        }).optional(),
+        finish_reason: z.string().optional().nullable(),
+      }),
+    )
+    .optional(),
+  usage: z
+    .object({
+      prompt_tokens: z.number().optional(),
+      completion_tokens: z.number().optional(),
+    })
+    .optional(),
+});
+
 const REQUEST_TIMEOUT_MS = 10_000;
+const ERROR_BODY_LIMIT = 2_048;
 
 export function createOpenAICompatible(config: OpenAICompatibleConfig): ChatProvider {
   const baseUrl = config.baseUrl.replace(/\/$/, '');
@@ -76,13 +97,139 @@ export function createOpenAICompatible(config: OpenAICompatibleConfig): ChatProv
     }
   }
 
-  async function* streamChat(): AsyncIterable<import('./types').ChatChunk> {
-    // Implemented in step S1.4.
-    return;
-    yield {} as never;
+  async function* streamChat(
+    req: ChatRequest,
+    apiKey?: string,
+  ): AsyncIterable<ChatChunk> {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    if (apiKey) {
+      headers.Authorization = `Bearer ${apiKey}`;
+    }
+
+    const body = JSON.stringify({
+      model: req.model,
+      messages: req.messages,
+      stream: true,
+      stream_options: { include_usage: true },
+    });
+
+    let res: Response;
+    try {
+      res = await fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers,
+        body,
+        signal: req.signal,
+      });
+    } catch (err) {
+      if (isAbortError(err)) {
+        return;
+      }
+      yield {
+        type: 'error',
+        code: 'provider_unavailable',
+        message: messageOf(err),
+      };
+      return;
+    }
+
+    if (!res.ok) {
+      const bodyText = await readLimitedBody(res.body, ERROR_BODY_LIMIT);
+      let code: string;
+      switch (res.status) {
+        case 401:
+        case 403:
+          code = 'auth_failed';
+          break;
+        case 429:
+          code = 'rate_limited';
+          break;
+        default:
+          code = 'provider_error';
+      }
+      yield {
+        type: 'error',
+        code,
+        message: bodyText || `Provider returned ${res.status}`,
+      };
+      return;
+    }
+
+    try {
+      for await (const payload of parseSse(res.body as ReadableStream<Uint8Array>)) {
+        if (payload === '[DONE]') {
+          return;
+        }
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(payload);
+        } catch {
+          continue;
+        }
+        const validated = ChatCompletionChunkSchema.safeParse(parsed);
+        if (!validated.success) continue;
+        const data = validated.data;
+        const choice = data.choices?.[0];
+        if (choice) {
+          const content = choice.delta?.content;
+          if (typeof content === 'string' && content.length > 0) {
+            yield { type: 'text_delta', text: content };
+          }
+          if (choice.finish_reason) {
+            yield { type: 'finish', reason: choice.finish_reason };
+          }
+        }
+        if (data.usage) {
+          yield {
+            type: 'usage',
+            inputTokens: data.usage.prompt_tokens,
+            outputTokens: data.usage.completion_tokens,
+          };
+        }
+      }
+    } catch (err) {
+      if (isAbortError(err)) {
+        return;
+      }
+      yield {
+        type: 'error',
+        code: 'provider_unavailable',
+        message: messageOf(err),
+      };
+    }
   }
 
   return { id: config.id, listModels, streamChat };
+}
+
+function isAbortError(err: unknown): boolean {
+  return err instanceof Error && err.name === 'AbortError';
+}
+
+async function readLimitedBody(
+  stream: ReadableStream<Uint8Array> | null,
+  limit: number,
+): Promise<string> {
+  if (!stream) return '';
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  const reader = stream.getReader();
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) {
+        chunks.push(value);
+        total += value.length;
+        if (total >= limit) break;
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  return Buffer.concat(chunks).toString('utf-8');
 }
 
 function messageOf(err: unknown): string {

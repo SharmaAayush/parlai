@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createOpenAICompatible } from './openai-compatible';
 
-function installFetchMock(handler: (input: RequestInfo | URL, init?: RequestInit) => Response | Promise<Response>) {
+function installFetchMock(handler: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>) {
   const originalFetch = globalThis.fetch;
   (globalThis as unknown as { fetch: typeof fetch }).fetch = vi.fn(handler);
   return () => {
@@ -28,7 +28,7 @@ describe('createOpenAICompatible.listModels', () => {
 
   it('returns the list of models', async () => {
     const captured: RequestInit[] = [];
-    restore = installFetchMock((_input, init) => {
+    restore = installFetchMock(async (_input, init) => {
       captured.push(init ?? {});
       return jsonResponse({
         data: [
@@ -56,7 +56,7 @@ describe('createOpenAICompatible.listModels', () => {
 
   it('omits Authorization header when no key is provided', async () => {
     const captured: RequestInit[] = [];
-    restore = installFetchMock((_input, init) => {
+    restore = installFetchMock(async (_input, init) => {
       captured.push(init ?? {});
       return jsonResponse({ data: [] });
     });
@@ -74,7 +74,7 @@ describe('createOpenAICompatible.listModels', () => {
 
   it('strips trailing slash from base URL', async () => {
     const captured: string[] = [];
-    restore = installFetchMock((input) => {
+    restore = installFetchMock(async (input) => {
       captured.push(String(input));
       return jsonResponse({ data: [] });
     });
@@ -91,7 +91,7 @@ describe('createOpenAICompatible.listModels', () => {
   });
 
   it('401 produces ProviderAuthError without the key', async () => {
-    restore = installFetchMock(() => jsonResponse({ error: { message: 'invalid key' } }, { status: 401 }));
+    restore = installFetchMock(async () => jsonResponse({ error: { message: 'invalid key' } }, { status: 401 }));
 
     const provider = createOpenAICompatible({
       id: 'openrouter',
@@ -106,7 +106,7 @@ describe('createOpenAICompatible.listModels', () => {
   });
 
   it('403 produces ProviderAuthError', async () => {
-    restore = installFetchMock(() => jsonResponse({ error: { message: 'forbidden' } }, { status: 403 }));
+    restore = installFetchMock(async () => jsonResponse({ error: { message: 'forbidden' } }, { status: 403 }));
 
     const provider = createOpenAICompatible({
       id: 'openrouter',
@@ -121,7 +121,7 @@ describe('createOpenAICompatible.listModels', () => {
   });
 
   it('500 produces ProviderUnavailableError without the key', async () => {
-    restore = installFetchMock(() => jsonResponse({ error: { message: 'boom' } }, { status: 500 }));
+    restore = installFetchMock(async () => jsonResponse({ error: { message: 'boom' } }, { status: 500 }));
 
     const provider = createOpenAICompatible({
       id: 'openrouter',
@@ -136,7 +136,7 @@ describe('createOpenAICompatible.listModels', () => {
   });
 
   it('network failure produces ProviderUnavailableError without the key', async () => {
-    restore = installFetchMock(() => {
+    restore = installFetchMock(async () => {
       throw new TypeError('fetch failed');
     });
 
@@ -154,7 +154,7 @@ describe('createOpenAICompatible.listModels', () => {
 
   it('fetch abort produces ProviderUnavailableError', async () => {
     const controller = new AbortController();
-    restore = installFetchMock(() => {
+    restore = installFetchMock(async () => {
       return new Promise((resolve, reject) => {
         controller.signal.addEventListener('abort', () =>
           reject(new DOMException('The operation was aborted.', 'AbortError')),
@@ -177,7 +177,7 @@ describe('createOpenAICompatible.listModels', () => {
   });
 
   it('malformed JSON produces ProviderBadResponseError', async () => {
-    restore = installFetchMock(() => new Response('not json', { status: 200 }));
+    restore = installFetchMock(async () => new Response('not json', { status: 200 }));
 
     const provider = createOpenAICompatible({
       id: 'openrouter',
@@ -192,7 +192,7 @@ describe('createOpenAICompatible.listModels', () => {
   });
 
   it('unexpected response shape produces ProviderBadResponseError', async () => {
-    restore = installFetchMock(() => jsonResponse({ not_data: [] }));
+    restore = installFetchMock(async () => jsonResponse({ not_data: [] }));
 
     const provider = createOpenAICompatible({
       id: 'openrouter',
@@ -207,7 +207,7 @@ describe('createOpenAICompatible.listModels', () => {
   });
 
   it('never includes the API key in any error message', async () => {
-    restore = installFetchMock(() => {
+    restore = installFetchMock(async () => {
       throw new TypeError('fetch failed');
     });
 
