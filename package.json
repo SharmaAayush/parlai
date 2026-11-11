@@ -20,17 +20,24 @@
     "docker:build": "docker build -t parl-ai:local ."
   },
   "dependencies": {
+    "@radix-ui/react-scroll-area": "^1.4.0",
+    "@radix-ui/react-slot": "^1.5.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "next": "16.4.3",
     "pg": "^8.23.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "reflect-metadata": "^0.2.2",
+    "tailwind-merge": "^3.7.0",
     "typeorm": "^1.1.2",
     "typeorm-naming-strategies": "^4.1.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^20",
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
@@ -41,6 +48,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
     "eslint-config-prettier": "^10.1.8",
+    "jsdom": "^31.0.0",
     "prettier": "^3.9.10",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",

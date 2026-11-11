@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'tests/**/*.test.ts', 'tests/**/*.test.tsx'],
     // globalSetup: ['./tests/global-setup.ts'],
     env: {
       DATABASE_URL: process.env.TEST_DATABASE_URL,
