@@ -190,7 +190,42 @@ This file tracks the implementation status of each step in the plan.
 | S0.7 | ✅ Complete | All checks pass |
 | S0.8 | ✅ Complete | All checks pass |
 
-**Last Updated:** 2026-11-03
+**Last Updated:** 2026-11-12
+
+---
+
+## Phase 1: Draft
+
+### S1.1: Provider config from env ✅ COMPLETED
+**Goal:** read supported providers, allowed models and defaults, validated at startup.
+**Needs:** S0.3
+**Files created/modified:**
+- `src/server/providers/config.ts` - `ProviderConfig`, `loadProviderConfig`, `providerEnvPrefix`, `parseModelRef`
+- `src/server/providers/config.test.ts` - valid config, unknown provider, bad default, invalid URL, no server access, duplicate ids, all-errors collection
+- `src/server/env.ts` - `loadProviderConfigFromEnv`, `getProviders`, `getAllowedModels`, `getDefaultModel`
+**Verified:** all config tests pass; bad `DEFAULT_MODEL` fails startup with readable message.
+**Commit:** `step S1.1: provider config from env`
+
+### S1.2: Provider types and registry ✅ COMPLETED
+**Goal:** define the `ChatProvider` interface and registry.
+**Needs:** S1.1
+**Files created/modified:**
+- `src/server/providers/types.ts` - `Role`, `ChatMessage`, `ModelInfo`, `ChatRequest`, `ChatChunk`, `ChatProvider`
+- `src/server/providers/registry.ts` - `createRegistry` with `get`/`has`, throws `AppError(400, 'unknown_provider')`
+- `src/server/http/errors.ts` - `AppError` class (pre-existed)
+- `src/server/providers/registry.test.ts` - fake adapter tests
+**Verified:** code compiles; registry tests pass.
+**Commit:** `step S1.2: provider interface and registry`
+
+### S1.3: OpenAI-compatible adapter: listModels ✅ COMPLETED
+**Goal:** fetch the list of models from any OpenAI-compatible endpoint.
+**Needs:** S1.2
+**Files created/modified:**
+- `src/server/providers/errors.ts` - `ProviderError`, `ProviderAuthError`, `ProviderUnavailableError`, `ProviderBadResponseError`
+- `src/server/providers/openai-compatible.ts` - `createOpenAICompatible` with `listModels` (bearer auth only when key present, 10s timeout, Zod parsing, typed errors, no key leakage)
+- `src/server/providers/openai-compatible.test.ts` - success, missing key, 401/403, 5xx, network failure, abort, malformed body, bad shape, key-not-in-error-message
+**Verified:** all 11 listModels tests pass; lint and typecheck pass.
+**Commit:** `step S1.3: openai-compatible listModels`
 
 ---
 
