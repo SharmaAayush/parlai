@@ -255,6 +255,20 @@ This file tracks the implementation status of each step in the plan.
 
 ---
 
+### S1.6 Streaming chat endpoint (stateless) ✅ COMPLETED
+**Goal:** `POST /api/chat` streams a model response as SSE.
+**Needs:** S1.4, S1.5
+**Files created/modified:**
+- `src/server/http/sse.ts` - `sseResponse(generator, { signal })` helper building a ReadableStream writing SSE events, headers `Content-Type: text/event-stream`, `Cache-Control: no-cache, no-transform`, `X-Accel-Buffering: no`; cancel() aborts an AbortController so upstream stops on client disconnect.
+- `src/app/api/chat/route.ts` - POST handler (`runtime='nodejs'`, `dynamic='force-dynamic'`); Zod body schema; `parseModelRef`; `model_not_allowed` 400; `streamChat` with server key and `request.signal`; chunks mapped to SSE events (`text_delta`→`delta`, `finish`+`usage` accumulated into one final `done`, `error`→`error`).
+- `tests/helpers/fake-provider.ts` - fake `ChatProvider` with scripted chunks, delay option, `streamStopped` flag.
+- `src/app/api/chat/route.test.ts` - integration tests: deltas then done, 400 disallowed model, abort stops stream, error chunk → error event.
+- `src/server/providers/registry.ts` - added `getRegistry()`/`setRegistry()` for replaceable registry in tests, plus `createDefaultRegistry()`.
+**Verified:** all tests pass (68 total); lint clean; typecheck clean.
+**Commit:** `step S1.6: streaming chat endpoint`
+
+---
+
 ## PR Review Results (PR #3)
 
 The PR review identified the following issues:
