@@ -229,6 +229,32 @@ This file tracks the implementation status of each step in the plan.
 
 ---
 
+### S1.4 OpenAI-compatible adapter: streamChat ✅ COMPLETED
+**Goal:** stream a chat completion and convert it into `ChatChunk`s.
+**Needs:** S1.3
+**Files created/modified:**
+- `src/server/providers/sse.ts` - `parseSse` standalone parser
+- `src/server/providers/openai-compatible.ts` - `streamChat` (server key, safe error codes)
+- `src/server/providers/openai-compatible.test.ts` - fixtures, 1-byte chunking test, 401/429/abort
+- `tests/fixtures/sse/*.txt` - recorded stream fixtures
+**Verified:** all tests pass, including the 1-byte chunking test.
+**Commit:** `step S1.4: openai-compatible streamChat`
+
+---
+
+### S1.5 Models endpoint (server models only) ✅ COMPLETED
+**Goal:** an API that tells the UI which models are available.
+**Needs:** S1.1
+**Files created/modified:**
+- `src/server/providers/config.ts` - `defaultProvider` in result, `PublicModel`, `PublicProvider`, `toPublicProvider` mapper
+- `src/server/env.ts` - `getDefaultProvider()`
+- `src/app/api/models/route.ts` - `GET` returning `{ default, providers[] }` grouped by provider in env order, no secret leak
+- `src/app/api/models/route.test.ts` - grouping, default, env order, no API key in output
+**Verified:** all models tests pass; lint and typecheck pass; `JSON.stringify(response)` does not contain any configured API key.
+**Commit:** `step S1.5: models endpoint`
+
+---
+
 ## PR Review Results (PR #3)
 
 The PR review identified the following issues:
