@@ -1,2 +1,3 @@
 - [S1.6 streaming chat endpoint](memory/s1-6-streaming-chat-endpoint.md) — complete: stateless POST /api/chat SSE endpoint
 - [S1.7 chat UI shell](memory/s1-7-chat-ui-shell.md) — complete: chat page, MessageList, Composer, useChatStream hook, SSE client
+- [S1.8 markdown rendering](memory/s1-8-markdown-rendering.md) — complete: Markdown component, CodeBlock, prose styling

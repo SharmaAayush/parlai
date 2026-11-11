@@ -1,6 +1,7 @@
 'use client'
 
 import type { ChatMessage } from '@/server/providers/types'
+import { Markdown } from './markdown'
 
 interface MessageListProps {
   messages: ChatMessage[]
@@ -9,7 +10,7 @@ interface MessageListProps {
 
 export function MessageList({ messages, status }: MessageListProps) {
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 prose sm:prose-lg max-w-none">
       {messages.map((message, index) => (
         <div key={index} className="flex gap-3">
           <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium">
@@ -20,13 +21,17 @@ export function MessageList({ messages, status }: MessageListProps) {
               {message.role}
             </div>
             <div
-              className={`rounded-lg px-3 py-2 whitespace-pre-wrap break-words ${
+              className={`rounded-lg px-3 py-2 break-words ${
                 message.role === 'user'
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-secondary text-secondary-foreground'
               }`}
             >
-              {message.content}
+              {message.role === 'user' ? (
+                <span>{message.content}</span>
+              ) : (
+                <Markdown className="prose-invert">{message.content}</Markdown>
+              )}
             </div>
           </div>
         </div>

@@ -290,6 +290,23 @@ This file tracks the implementation status of each step in the plan.
 
 ---
 
+### S1.8 Markdown and code rendering ✅ COMPLETED
+**Goal:** assistant replies look good and are safe.
+**Needs:** S1.7
+
+**Files created/modified:**
+- `src/components/chat/markdown.tsx` - `Markdown` component using react-markdown with remark-gfm and rehype-highlight; no raw HTML (rehype-raw disabled); links open `_blank rel="noopener noreferrer"`; code fences rendered via `CodeBlock`
+- `src/components/chat/code-block.tsx` - `CodeBlock` component with language label and Copy button (`navigator.clipboard.writeText`) showing "Copied" briefly
+- `src/components/chat/message-list.tsx` - assistant messages now render through `Markdown`
+- `src/components/chat/markdown.test.tsx` - tests: headings, lists, tables, code fences, HTML escaping (no script element), no `javascript:` live links
+- `src/app/globals.css` - added `@import "@tailwindcss/typography"`
+- `package.json` - added react-markdown, remark-gfm, rehype-highlight, highlight.js, @tailwindcss/typography
+
+**Verified:** `pnpm lint` clean, `pnpm typecheck` clean, `pnpm test` passes (77 tests across 14 files).
+**Commit:** `step S1.8: markdown rendering`
+
+---
+
 ## PR Review Results (PR #3)
 
 The PR review identified the following issues:
