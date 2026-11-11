@@ -15,6 +15,7 @@ export type AllowedModel = {
 export type ProviderConfigResult = {
   providers: ProviderConfig[];
   allowedModels: AllowedModel[];
+  defaultProvider: string;
   defaultModel: string;
 };
 
@@ -148,5 +149,20 @@ export function loadProviderConfig(source: Record<string, string | undefined>): 
     throw new Error(`Invalid provider configuration:\n${errors.join('\n')}`);
   }
 
-  return { providers, allowedModels, defaultModel: defaultModelRaw };
+  return { providers, allowedModels, defaultProvider, defaultModel: defaultModelRaw };
+}
+
+export type PublicModel = {
+  modelId: string;
+  keySource: 'server' | 'user';
+};
+
+export type PublicProvider = {
+  id: string;
+  label: string;
+  models: PublicModel[];
+};
+
+export function toPublicProvider(config: ProviderConfig, models: PublicModel[]): PublicProvider {
+  return { id: config.id, label: config.label, models };
 }

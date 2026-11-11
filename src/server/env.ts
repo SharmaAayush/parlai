@@ -52,6 +52,10 @@ export function getDefaultModel(): ProviderConfigResult['defaultModel'] {
   return providerConfig.get().defaultModel;
 }
 
+export function getDefaultProvider(): ProviderConfigResult['defaultProvider'] {
+  return providerConfig.get().defaultProvider;
+}
+
 export const env = new Proxy({} as Env, {
   get(_target, prop: string) {
     if (cachedEnv === null) {
