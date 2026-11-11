@@ -38,4 +38,25 @@ export function createRegistry(configs: Record<string, unknown>, adapterFactorie
   };
 }
 
+let registry: Registry | null = null;
+
+export function getRegistry(): Registry {
+  if (!registry) {
+    throw new Error('Provider registry has not been initialized. Call setRegistry() first.');
+  }
+  return registry;
+}
+
+export function setRegistry(r: Registry): void {
+  registry = r;
+}
+
+export function createDefaultRegistry(
+  configs: Record<string, unknown>,
+  adapterFactories: Record<string, AdapterFactory>,
+): Registry {
+  registry = createRegistry(configs, adapterFactories);
+  return registry;
+}
+
 export type { Registry };
