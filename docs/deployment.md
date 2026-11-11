@@ -143,6 +143,18 @@ Secrets live in `.env.production` on the server (chmod 600). Only the deployment
 | NODE_ENV | Yes | `production` | Node environment |
 | PARLAI_IMAGE | No | `ghcr.io/owner/parl-ai:v0.1.0` | Docker image to use (default: parl-ai:local) |
 | TRUST_PROXY | Yes (with proxy) | `true` | Trust proxy headers for secure cookies |
+| SUPPORTED_PROVIDERS | Yes | `openrouter,local` | Comma-separated list of supported provider ids |
+| PROVIDER_OPENROUTER_LABEL | No | `OpenRouter` | Display label for the OpenRouter provider |
+| PROVIDER_OPENROUTER_TYPE | No | `openai-compatible` | Provider type |
+| PROVIDER_OPENROUTER_BASE_URL | Yes | `https://openrouter.ai/api/v1` | Base URL for OpenRouter API |
+| PROVIDER_OPENROUTER_API_KEY | No | `sk-...` | Server API key for OpenRouter |
+| PROVIDER_LOCAL_LABEL | No | `Local (Ollama)` | Display label for the local provider |
+| PROVIDER_LOCAL_TYPE | No | `openai-compatible` | Provider type |
+| PROVIDER_LOCAL_BASE_URL | Yes | `http://localhost:11434/v1` | Base URL for local provider API |
+| PROVIDER_LOCAL_REQUIRES_KEY | No | `false` | Whether the local provider requires an API key |
+| ALLOWED_MODELS | Yes | `openrouter:vendor/model-a,local:llama3.1:8b` | Comma-separated list of allowed providerId:modelId entries |
+| DEFAULT_PROVIDER | Yes | `openrouter` | Default provider (must be in ALLOWED_MODELS) |
+| DEFAULT_MODEL | Yes | `vendor/model-a` | Default model (must be in ALLOWED_MODELS) |
 
 ## Troubleshooting
 
