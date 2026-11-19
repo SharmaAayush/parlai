@@ -307,6 +307,21 @@ This file tracks the implementation status of each step in the plan.
 
 ---
 
+### S1.9 Stop and regenerate ✅ COMPLETED
+**Goal:** cancel a running answer and re-ask the last question.
+**Needs:** S1.7
+
+**Files created/modified:**
+- `src/components/chat/use-chat-stream.ts` - `AbortController` per request; `stop()` aborts, sets status `idle`, keeps partial text, no error; `regenerate()` removes last assistant message and re-streams from history up to last user message; disabled while streaming.
+- `src/app/chat/page.tsx` - Stop button shown while streaming.
+- `src/components/chat/message-list.tsx` - Regenerate button on the last assistant message when idle.
+- `tests/use-chat-stream.test.tsx` - stop keeps partial text and no error; regenerate replaces only last assistant message; regenerate disabled while streaming (6 tests).
+
+**Verified:** all 6 use-chat-stream tests pass; lint clean; typecheck clean.
+**Commit:** `step S1.9: stop and regenerate`
+
+---
+
 ## PR Review Results (PR #3)
 
 The PR review identified the following issues:
