@@ -20,6 +20,7 @@
     "docker:build": "docker build -t parl-ai:local ."
   },
   "dependencies": {
+    "@node-rs/argon2": "^2.2.2",
     "@radix-ui/react-scroll-area": "^1.4.0",
     "@radix-ui/react-slot": "^1.5.0",
     "@tailwindcss/typography": "^0.5.20",
