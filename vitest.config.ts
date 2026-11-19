@@ -9,7 +9,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'tests/**/*.test.ts', 'tests/**/*.test.tsx'],
-    // globalSetup: ['./tests/global-setup.ts'],
+    globalSetup: ['./tests/global-setup.ts'],
     env: {
       DATABASE_URL: process.env.TEST_DATABASE_URL,
     },

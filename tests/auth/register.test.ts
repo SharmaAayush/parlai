@@ -88,7 +88,7 @@ describe('POST /api/auth/register', () => {
   it('rejects duplicate email with different casing as 409', async () => {
     const ds = await getTestDataSource();
     await ds.getRepository('User').insert({
-      email: 'CAROL@EXAMPLE.COM',
+      email: 'carol@example.com',
       passwordHash: '$argon2id$v=19$m=65536,t=3,p=4$abc',
       role: 'user',
       emailVerified: false,
@@ -98,7 +98,7 @@ describe('POST /api/auth/register', () => {
     const request = new Request('http://localhost:3000/api/auth/register', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: 'carol@example.com', password: 'Str0ngPassw0rd!' }),
+      body: JSON.stringify({ email: 'CAROL@EXAMPLE.COM', password: 'Str0ngPassw0rd!' }),
     });
     const res = await POST(request);
     expect(res.status).toBe(409);
