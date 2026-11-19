@@ -48,24 +48,15 @@ export function useChatStream({
     setError(null)
   }, [])
 
-  const send = useCallback(
-    async (text: string) => {
-      if (status === 'streaming') return
-
-      const userMessage: ChatMessage = { role: 'user', content: text }
-
-      setMessages((prev) => [...prev, userMessage])
-      setMessages((prev) => [...prev, { role: 'assistant', content: '' }])
-
-      abortControllerRef.current = new AbortController()
-      const signal = abortControllerRef.current.signal
-
+  /**
+   * Stream a response from the chat endpoint into the last assistant message.
+   * `history` is everything sent upstream (must end with the user message).
+   */
+  const streamResponse = useCallback(
+    async (history: ChatMessage[], signal: AbortSignal) => {
       streamingRef.current = true
       setStatus('streaming')
       setError(null)
-
-      // History to send upstream: everything before this turn plus the user message.
-      const history = [...messagesRef.current, userMessage]
 
       try {
         for await (const event of sseClient(url, {
@@ -114,7 +105,27 @@ export function useChatStream({
 
       abortControllerRef.current = null
     },
-    [status, url, model],
+    [url, model],
+  )
+
+  const send = useCallback(
+    async (text: string) => {
+      if (status === 'streaming') return
+
+      const userMessage: ChatMessage = { role: 'user', content: text }
+
+      setMessages((prev) => [...prev, userMessage])
+      setMessages((prev) => [...prev, { role: 'assistant', content: '' }])
+
+      abortControllerRef.current = new AbortController()
+      const signal = abortControllerRef.current.signal
+
+      // History to send upstream: everything before this turn plus the user message.
+      const history = [...messagesRef.current, userMessage]
+
+      void streamResponse(history, signal)
+    },
+    [status, streamResponse],
   )
 
   const regenerate = useCallback(() => {
@@ -129,17 +140,19 @@ export function useChatStream({
 
     // Replay history up to the last user message (drop any trailing assistant-only tail).
     const lastUserIndex = withoutLast.findIndex((m) => m.role === 'user')
-    const history = lastUserIndex === -1 ? [] : withoutLast.slice(0, lastUserIndex + 1)
+    if (lastUserIndex === -1) return
 
-    setMessages(history)
-    messagesRef.current = history
+    const history = withoutLast.slice(0, lastUserIndex + 1)
 
-    // Retry by resending the last user message.
-    if (lastUserIndex !== -1) {
-      const lastUser = history[lastUserIndex]!
-      void send(lastUser.content)
-    }
-  }, [status, send])
+    // Replace the removed assistant message with a fresh empty one and stream into it.
+    setMessages([...history, { role: 'assistant', content: '' }])
+    messagesRef.current = [...history, { role: 'assistant', content: '' }]
+
+    abortControllerRef.current = new AbortController()
+    const signal = abortControllerRef.current.signal
+
+    void streamResponse(history, signal)
+  }, [status, streamResponse])
 
   return { messages, status, error, send, stop, regenerate }
 }

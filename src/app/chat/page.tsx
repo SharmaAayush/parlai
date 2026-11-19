@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 export default function ChatPage() {
   const [model, setModel] = useState('')
 
-  const { messages, status, error, send, stop } = useChatStream({
+  const { messages, status, error, send, stop, regenerate } = useChatStream({
     url: '/api/chat',
     model,
     initialMessages: [{ role: 'assistant', content: 'How can I help you today?' }],
@@ -37,7 +37,7 @@ export default function ChatPage() {
 
       <main className="flex-1 flex flex-col overflow-hidden">
         <ScrollArea className="flex-1">
-          <MessageList messages={messages} status={status} />
+          <MessageList messages={messages} status={status} onRegenerate={regenerate} />
         </ScrollArea>
         {error && (
           <div className="border border-destructive bg-destructive/10 text-destructive px-4 py-2 text-sm">

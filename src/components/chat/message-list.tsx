@@ -2,13 +2,22 @@
 
 import type { ChatMessage } from '@/server/providers/types'
 import { Markdown } from './markdown'
+import { Button } from '@/components/ui/button'
 
 interface MessageListProps {
   messages: ChatMessage[]
   status: 'idle' | 'streaming' | 'error'
+  onRegenerate?: () => void
 }
 
-export function MessageList({ messages, status }: MessageListProps) {
+export function MessageList({
+  messages,
+  status,
+  onRegenerate,
+}: MessageListProps) {
+  const lastIsAssistant =
+    messages.length > 0 && messages.at(messages.length - 1)?.role === 'assistant'
+
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4 prose sm:prose-lg max-w-none">
       {messages.map((message, index) => (
@@ -32,6 +41,20 @@ export function MessageList({ messages, status }: MessageListProps) {
               ) : (
                 <Markdown className="prose-invert">{message.content}</Markdown>
               )}
+              {lastIsAssistant &&
+                index === messages.length - 1 &&
+                status === 'idle' && (
+                  <div className="mt-2 text-right">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={onRegenerate}
+                      disabled={!onRegenerate}
+                    >
+                      Regenerate
+                    </Button>
+                  </div>
+                )}
             </div>
           </div>
         </div>
